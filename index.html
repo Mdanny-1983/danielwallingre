@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -35,16 +35,25 @@
             z-index: -1;
         }
 
+        /* ESTA ES LA CLAVE: El contenedor que agrupa a los dos hijos */
         .site-container {
             display: flex;
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             gap: 40px;
+            align-items: flex-start; /* Evita que el aside se estire */
         }
 
-        .sidebar { flex: 0 0 280px; position: sticky; top: 40px; height: fit-content; }
-        .nav-menu { list-style: none; padding: 0; }
+        .sidebar { 
+            flex: 0 0 280px; 
+            position: sticky; 
+            top: 40px; 
+            height: fit-content; 
+        }
+
+        .nav-menu { list-style: none; padding: 0; margin: 0; }
+        
         .btn-side {
             display: flex; align-items: center; padding: 16px 24px; margin-bottom: 12px;
             background: var(--blanco); color: var(--azul-medio); text-decoration: none;
@@ -61,7 +70,7 @@
 
         .perfil-foto img { width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--celeste); object-fit: cover; }
 
-        /* --- LÓGICA FAQ --- */
+        /* FAQ */
         .faq-item { border-bottom: 1px solid #eee; }
         .faq-question {
             width: 100%; background: none; border: none; padding: 20px 0;
@@ -73,7 +82,7 @@
         .faq-item.active .faq-answer { max-height: 300px; }
         .faq-item.active .fa-chevron-down { transform: rotate(180deg); transition: 0.3s; }
 
-        /* --- SLIDER --- */
+        /* SLIDER */
         .slider-wrapper { overflow: hidden; border-radius: 20px; height: 400px; margin: 20px 0; }
         .slides { display: flex; width: 400%; animation: slideShow 20s infinite; }
         .slide { width: 25%; }
@@ -87,20 +96,26 @@
             100% { transform: translateX(0); }
         }
 
-        @media (max-width: 900px) { .site-container { flex-direction: column; } .sidebar { position: relative; width: 100%; } }
+        @media (max-width: 900px) { 
+            .site-container { flex-direction: column; } 
+            .sidebar { position: relative; width: 100%; top: 0; } 
+        }
     </style>
 </head>
 <body>
     <div class="waves-bg"></div>
-<aside class="sidebar">
-    <nav>
-        <ul class="nav-menu">
-            <li><a href="esja13/esja13.html" class="btn-side"><i class="fas fa-university"></i> ESJA 13</a></li>
-            <li><a href="esja59/esja59.html" class="btn-side"><i class="fas fa-microscope"></i> ESJA 59</a></li>
-            <li><a href="ov/orientacion.html" class="btn-side"><i class="fas fa-compass"></i> O. Vocacional</a></li>
-        </ul>
-    </nav>
-</aside>
+
+    <div class="site-container">
+        
+        <aside class="sidebar">
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="esja13/esja13.html" class="btn-side"><i class="fas fa-university"></i> ESJA 13</a></li>
+                    <li><a href="esja59/esja59.html" class="btn-side"><i class="fas fa-microscope"></i> ESJA 59</a></li>
+                    <li><a href="ov/orientacion.html" class="btn-side"><i class="fas fa-compass"></i> O. Vocacional</a></li>
+                </ul>
+            </nav>
+        </aside>
 
         <main class="main-content">
             <header style="text-align:center; margin-bottom: 40px;">
@@ -120,14 +135,12 @@
 
             <section id="faq" class="card-section">
                 <h2>Preguntas Frecuentes</h2>
-                
                 <div class="faq-item">
                     <button class="faq-question">¿Cómo se aprueba el espacio? <i class="fas fa-chevron-down"></i></button>
                     <div class="faq-answer">
                         <p>La evaluación es formativa, contemplando conocimiento, responsabilidad y compromiso.</p>
                     </div>
                 </div>
-
                 <div class="faq-item">
                     <button class="faq-question">¿Cómo se entregan los trabajos? <i class="fas fa-chevron-down"></i></button>
                     <div class="faq-answer">
@@ -152,9 +165,8 @@
                 &copy; 2026 Basavilbaso, Entre Ríos.
             </footer>
         </main>
-    </div>
 
-    <script>
+    </div> <script>
         document.querySelectorAll('.faq-question').forEach(button => {
             button.addEventListener('click', () => {
                 const item = button.parentElement;
