@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Intereses | Prof. Daniel Wallingre</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --azul-oscuro: #154360; --azul-medio: #21618c; --gris-fondo: #f0f4f8; }
+        body { font-family: 'Roboto', sans-serif; background: var(--gris-fondo); margin: 0; padding: 0; color: #333; }
+        header { background: var(--azul-oscuro); color: white; text-align: center; padding: 40px 20px; }
+        .container { max-width: 900px; margin: auto; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        h1, h2 { font-family: 'Merriweather', serif; }
+        .instrucciones { border-left: 5px solid var(--azul-medio); background: #eef7fd; padding: 20px; border-radius: 0 15px 15px 0; margin-bottom: 30px; }
+        .tabla-test { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .fila-pregunta { border-bottom: 1px solid #eee; }
+        .texto-pregunta { padding: 15px 10px; font-size: 1.05rem; }
+        .opciones { text-align: center; width: 120px; }
+        .btn-resultado { display: block; width: 100%; max-width: 400px; margin: 40px auto; padding: 20px; font-size: 20px; font-weight: bold; background: var(--azul-medio); color: white; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; }
+        .btn-resultado:hover { background: var(--azul-oscuro); transform: translateY(-3px); }
+        #seccion-resultados { display: none; }
+        .resultado-texto { font-size: 1.3rem; color: var(--azul-oscuro); margin-bottom: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Test de Identificación de Intereses</h1>
+    <p>Prof. Daniel Wallingre</p>
+</header>
+
+<div class="container">
+    <div class="card instrucciones">
+        <h2>Instrucciones</h2>
+        <p>Marcá <b>"SÍ"</b> si te interesa la actividad o <b>"NO"</b> si no te atrae.</p>
+    </div>
+
+    <div class="card">
+        <form id="testForm">
+            <table class="tabla-test" id="tablaPreguntas"></table>
+            <button type="button" class="btn-resultado" onclick="procesarTest()">Obtener mi Perfil</button>
+        </form>
+    </div>
+
+    <div id="seccion-resultados" class="card">
+        <h2>Tus Resultados</h2>
+        <div id="diagnostico" class="resultado-texto"></div>
+        <canvas id="graficoIntereses"></canvas>
+        <center><br><a href="orientacion.html" style="text-decoration:none; color:var(--azul-medio); font-weight:bold;">← Volver</a></center>
+    </div>
+</div>
+
+<script>
+    const preguntas = [
+        "Acompañar personas en su recuperación física", "Aconsejar a personas sobre planes de ahorro", "Analizar y estudiar grupos étnicos", "Aplicar conocimientos en investigaciones", "Asistir en la producción agropecuaria", "Asesorar en el tratamiento de residuos", "Asesorar y participar en producciones artísticas", "Atender la salud de las personas", "Crear campañas publicitarias", "Crear estrategias de posicionamiento de marcas",
+        "Criar, cuidar y tratar animales y plantas", "Dar clases en cualquiera de los niveles del sistema", "Desempeñar funciones que requieren conocimientos de asistencia", "Diagnosticar, asistir y orientar personas con problemas psicológicos", "Diseñar programas de computación", "Diseñar dispositivos que ayuden a recuperar la capacidad motriz", "Diseñar juegos interactivos para PC", "Diseñar máquinas que puedan recrear actividades humanas", "Diseñar y planificar la producción masiva de artículos", "Diseñar campañas para introducir un nuevo producto",
+        "Estudiar idiomas extranjeros", "Evaluar y gestionar convenios internacionales", "Formar parte de espacios de producción cultural", "Gestionar y evaluar proyectos de desarrollo", "Hacer propuestas y formular estrategias para aprovechar las relaciones económicas", "Interpretar y explicar las estructuras y procesos políticos", "Investigar sobre áreas verdes y medio ambiente", "Investigar y probar productos farmacéuticos", "Organizar un plan de distribución y venta de una empresa", "Organizar y administrar una empresa",
+        "Participar en orquestas, bandas y campañas musicales", "Participar en el diseño y construcción de obras grandes", "Pintar, hacer esculturas, ilustrar libros", "Planificar el proceso productivo de la industria alimenticia", "Producir cortometrajes, spots publicitarios, etc.", "Proveer estrategias para la supervivencia y orientación de personas en la naturaleza", "Realizar el control de calidad de los alimentos", "Redactar, registrar y procesar documentos", "Redactar notas periodísticas, cuentos, poesías", "Revisar y dar mantenimiento a artefactos eléctricos",
+        "Seleccionar, capacitar y gestionar personal", "Ser parte de un grupo de teatro", "Ser parte de un equipo de marketing", "Trabajar con niños, jóvenes y adultos para promover su desarrollo", "Trabajar en el área contable", "Trabajar en la creación y mantenimiento de equipos de comunicación", "Trabajar en las áreas de comunicación", "Trabajar en laboratorios químicos", "Trabajar para prevenir riesgos de accidentes", "Trabajar por la inclusión de personas con discapacidad"
+    ];
+
+    const mapping = {
+        "Arte": [7, 9, 23, 31, 33, 35, 42],
+        "Sociales": [3, 12, 13, 21, 22, 24, 26, 39, 44, 50],
+        "Económicas": [2, 10, 25, 29, 30, 38, 41, 43, 45],
+        "Tecnología": [15, 17, 18, 19, 32, 40, 46],
+        "Salud/Bio": [1, 4, 5, 6, 8, 11, 14, 16, 20, 27, 28, 34, 36, 37, 48, 49]
+    };
+
+    function cargarPreguntas() {
+        const tabla = document.getElementById('tablaPreguntas');
+        preguntas.forEach((p, i) => {
+            const row = `<tr class="fila-pregunta"><td class="texto-pregunta">${i + 1}. ${p}</td><td class="opciones"><label><input type="radio" name="p${i+1}" value="1"> SÍ</label> <label><input type="radio" name="p${i+1}" value="0"> NO</label></td></tr>`;
+            tabla.innerHTML += row;
+        });
+    }
+
+    let chartInstance = null;
+
+    function procesarTest() {
+        const form = new FormData(document.getElementById('testForm'));
+        let resultados = { "Arte": 0, "Sociales": 0, "Económicas": 0, "Tecnología": 0, "Salud/Bio": 0 };
+
+        for (let area in mapping) {
+            mapping[area].forEach(n => { if (form.get(`p${n}`) === "1") resultados[area]++; });
+        }
+
+        document.getElementById('seccion-resultados').style.display = 'block';
+        const mayor = Object.keys(resultados).reduce((a, b) => resultados[a] > resultados[b] ? a : b);
+        document.getElementById('diagnostico').innerHTML = `Perfil predominante: <strong>${mayor}</strong>`;
+        
+        const ctx = document.getElementById('graficoIntereses').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'polarArea',
+            data: { labels: Object.keys(resultados), datasets: [{ data: Object.values(resultados), backgroundColor: ['#154360cc', '#21618ccc', '#3498dbcc', '#2e7d32cc', '#fbc02dcc'] }] }
+        });
+        window.scrollTo({ top: document.getElementById('seccion-resultados').offsetTop, behavior: 'smooth' });
+    }
+
+    window.onload = cargarPreguntas;
+</script>
+</body>
+</html>
